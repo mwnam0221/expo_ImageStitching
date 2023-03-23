@@ -14,6 +14,7 @@ parser.add_argument('-fs', '--FOCAL_SCALE', default=1, type=float, help='Camera 
 parser.add_argument('-ss', '--SIZE_SCALE', default=2, type=float, help='Camera Undistort Size Scale')
 parser.add_argument('-blend','--BLEND_FLAG', default=False, type=bool, help='Blend BEV Image (Ture/False)')
 parser.add_argument('-balance','--BALANCE_FLAG', default=False, type=bool, help='Balance BEV Image (Ture/False)')
+parser.add_argument('-save','--SAVE_VIDEO', default=False, type=bool, help='Save Video (Ture/False)')
 args = parser.parse_args()
 
 FRAME_WIDTH = args.FRAME_WIDTH
@@ -24,6 +25,7 @@ CAR_WIDTH = args.CAR_WIDTH
 CAR_HEIGHT = args.CAR_HEIGHT
 FOCAL_SCALE = args.FOCAL_SCALE
 SIZE_SCALE = args.SIZE_SCALE
+SAVE_VIDEO = args.SAVE_VIDEO
 
 
 def padding(img,width,height):
@@ -321,7 +323,7 @@ class BevGenerator:
 
         images = [mask(camera.raw2bev(img)) 
                   for img, mask, camera in zip(images, self.masks, self.cameras)]
-        
+         
         surround = cv2.add(images[0],images[1])
         surround = cv2.add(surround,images[2])
         surround = cv2.add(surround,images[3])
@@ -366,30 +368,33 @@ def main():
         
         surround, panaroma_images, mask_images = bev(front,back,left,right,car)
         
-        cv2.namedWindow('panaroma_images', flags = cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
-        cv2.imshow('panaroma_images', panaroma_images)
+        cv2.namedWindow('Input_images', flags = cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+        cv2.imshow('Input_images', panaroma_images)
 
         cv2.namedWindow('surround', flags = cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
         cv2.imshow('surround', surround)
+        
+ 
         # cv2.imwrite('./surround_sample1.jpg', surround)
 
-        # cv2.namedWindow('new_images', flags = cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
-        # mask_images[2] = cv2.rotate(mask_images[2], cv2.ROTATE_90_CLOCKWISE)
-        # mask_images[3] = cv2.rotate(mask_images[3], cv2.ROTATE_90_COUNTERCLOCKWISE)
-        # mask_images[1] = cv2.rotate(mask_images[1], cv2.ROTATE_180)
-        # tt = np.hstack([mask_images[1],mask_images[2], mask_images[0], mask_images[3]])
-        # cv2.imshow('new_images', tt)
+        cv2.namedWindow('new_images', flags = cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+        mask_images[2] = cv2.rotate(mask_images[2], cv2.ROTATE_90_CLOCKWISE)
+        mask_images[3] = cv2.rotate(mask_images[3], cv2.ROTATE_90_COUNTERCLOCKWISE)
+        mask_images[1] = cv2.rotate(mask_images[1], cv2.ROTATE_180)
+        tt = np.hstack([mask_images[1],mask_images[2], mask_images[0], mask_images[3]])
+        cv2.imshow('new_images', tt)
         
         video_frame.append(surround)
         
         if cv2.waitKey(1) == ord('q') or cv2.waitKey(1) == ord('Q'):  # q to quit
             break
-    
-    # out = cv2.VideoWriter('./video_sample.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 10, (surround.shape[1], surround.shape[0]))
-    # for frame in video_frame:
-    #     out.write(frame)
-    # out.release()        
-    cv2.destroyAllWindows()
+        
+    if SAVE_VIDEO:
+        out = cv2.VideoWriter('./video_sample.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 10, (surround.shape[1], surround.shape[0]))
+        for frame in video_frame:
+            out.write(frame)
+        out.release()        
+        cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main()

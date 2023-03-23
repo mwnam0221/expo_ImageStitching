@@ -29,7 +29,7 @@ def runInCalib_1():
         raw_frame = cv2.imread(path)
         # cv2.imshow("Raw Image", raw_frame)
         undist_img = calibrator.undistort(raw_frame)        # 使用undistort方法得到去畸变图像
-        # cv2.imshow(f"Undistorted Image_{name}", undist_img)
+        cv2.imshow(f"Undistorted Image_{name}", undist_img)
         cv2.imwrite(f'./results/{name}.jpg', undist_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()

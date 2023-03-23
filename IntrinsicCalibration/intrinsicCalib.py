@@ -409,9 +409,10 @@ def main():
     print("Calibration Complete")
     print("Camera Matrix is : {}".format(result.camera_mat.tolist())) 
     print("Distortion Coefficient is : {}".format(result.dist_coeff.tolist()))
-    print("Reprojection Error is : {}".format(np.mean(result.reproj_err))) 
-    np.save('camera_{}_K.npy'.format(args.CAMERA_ID),result.camera_mat.tolist())
-    np.save('camera_{}_D.npy'.format(args.CAMERA_ID),result.dist_coeff.tolist())
+    print("Reprojection Error is : {}".format(np.mean(result.reproj_err)))
+    np.save('temp_camera_{}_K.npy'.format(args.CAMERA_ID),result.camera_mat.tolist())
+    print('here') 
+    np.save('temp_camera_{}_D.npy'.format(args.CAMERA_ID),result.dist_coeff.tolist())
         
 if __name__ == '__main__':
     main()
